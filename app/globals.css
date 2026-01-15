@@ -1,0 +1,28 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* TODO: Replace with official brand palette */
+  --brand-primary: #1f5eff;
+  --brand-secondary: #11224d;
+  --brand-accent: #ffb703;
+  /* TODO: Replace with official brand font */
+  --font-brand: "BrandFontPlaceholder";
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-brand), system-ui, sans-serif;
+  background: #f8fafc;
+  color: #0f172a;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
