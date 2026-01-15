@@ -38,6 +38,11 @@ const drawRoundedRect = (
 export default function ResultsPage() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
+  const downloadUrlRef = useRef<string | null>(null);
+  const [shareBlob, setShareBlob] = useState<Blob | null>(null);
+  const [shareSupported, setShareSupported] = useState(false);
+  const [shareError, setShareError] = useState<string | null>(null);
+  const [shareLink, setShareLink] = useState("");
 
   const scoreLabel = useMemo(
     () => `${RESULT_PAYLOAD.score}/${RESULT_PAYLOAD.total}`,
@@ -118,9 +123,60 @@ export default function ResultsPage() {
       ctx.font = "500 32px ui-sans-serif, system-ui";
       ctx.fillText("Condividi senza rimorsi. Screenshot & post.", 140, 1160);
 
-      setDownloadUrl(canvas.toDataURL("image/png"));
+      canvas.toBlob((blob) => {
+        if (!blob) return;
+        setShareBlob(blob);
+        const objectUrl = URL.createObjectURL(blob);
+        if (downloadUrlRef.current) {
+          URL.revokeObjectURL(downloadUrlRef.current);
+        }
+        downloadUrlRef.current = objectUrl;
+        setDownloadUrl(objectUrl);
+      }, "image/png");
     };
   }, [scoreLabel]);
+
+  useEffect(() => {
+    setShareSupported(Boolean(navigator?.share));
+    setShareLink(window.location.href);
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (downloadUrlRef.current) {
+        URL.revokeObjectURL(downloadUrlRef.current);
+      }
+    };
+  }, []);
+
+  const handleShare = async () => {
+    if (!shareBlob) return;
+    setShareError(null);
+    const shareFile = new File([shareBlob], "diploma-quiz.png", {
+      type: "image/png",
+    });
+    try {
+      if (navigator.canShare?.({ files: [shareFile] })) {
+        await navigator.share({
+          title: "Il mio diploma del quiz",
+          text: "Ho appena completato il quiz. Ecco il mio diploma!",
+          files: [shareFile],
+        });
+        return;
+      }
+      if (navigator.share) {
+        await navigator.share({
+          title: "Il mio diploma del quiz",
+          text: "Ho appena completato il quiz. Ecco il mio diploma!",
+          url: shareLink,
+        });
+        return;
+      }
+      setShareError("Condivisione non supportata su questo dispositivo.");
+    } catch (error) {
+      setShareError("Condivisione annullata o non disponibile.");
+    }
+  };
 
   return (
     <section className="flex flex-col gap-6">
@@ -171,19 +227,55 @@ export default function ResultsPage() {
               </li>
             </ul>
 
-            {downloadUrl ? (
-              <a
-                href={downloadUrl}
-                download="risultato-quiz.png"
-                className="mt-6 inline-flex w-full items-center justify-center rounded-full bg-brand-primary px-4 py-3 text-sm font-semibold text-white"
-              >
-                Scarica PNG
-              </a>
-            ) : (
-              <p className="mt-6 text-xs text-slate-400">
-                Generazione immagine in corso...
+            <div className="mt-6 flex flex-col gap-3">
+              {downloadUrl ? (
+                <a
+                  href={downloadUrl}
+                  download="diploma-quiz.png"
+                  className="inline-flex w-full items-center justify-center rounded-full bg-brand-primary px-4 py-3 text-sm font-semibold text-white"
+                >
+                  Scarica diploma
+                </a>
+              ) : (
+                <p className="text-xs text-slate-400">
+                  Generazione immagine in corso...
+                </p>
+              )}
+              {shareSupported && (
+                <button
+                  type="button"
+                  onClick={handleShare}
+                  className="inline-flex w-full items-center justify-center rounded-full border border-brand-primary/30 px-4 py-3 text-sm font-semibold text-brand-primary"
+                  disabled={!shareBlob}
+                >
+                  Condividi (mobile)
+                </button>
+              )}
+              {shareError && (
+                <p className="text-xs text-rose-500">{shareError}</p>
+              )}
+            </div>
+
+            <div className="mt-6 rounded-xl border border-slate-200 bg-white p-4 text-xs text-slate-600">
+              <p className="text-sm font-semibold text-slate-900">
+                Facebook & Instagram
               </p>
-            )}
+              <p className="mt-2">
+                Per condividere l&apos;immagine: scarica il diploma, poi caricalo
+                come foto o storia. Su Facebook puoi anche aprire il link di
+                condivisione.
+              </p>
+              <a
+                href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
+                  shareLink,
+                )}`}
+                target="_blank"
+                rel="noreferrer"
+                className="mt-3 inline-flex w-full items-center justify-center rounded-full border border-slate-200 px-3 py-2 text-xs font-semibold text-slate-700"
+              >
+                Apri condivisione Facebook
+              </a>
+            </div>
           </div>
         </div>
       </div>
