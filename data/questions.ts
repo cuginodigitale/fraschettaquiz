@@ -1,4 +1,13 @@
-export const questions = [
+export type Question = {
+  id: string;
+  category: string;
+  question: string;
+  choices: string[];
+  answerIndex: number;
+  explanation?: string;
+};
+
+export const questions: Question[] = [
   {
     id: "cucina-1",
     category: "cucina/ricette",
@@ -701,4 +710,82 @@ export const questions = [
     choices: ["Castel Sant'Angelo", "Trastevere", "Isola Tiberina", "Piazza del Popolo"],
     answerIndex: 0
   }
-] as const;
+];
+
+const MAX_UINT32 = 4294967296;
+
+const createSeededRandom = (seed: number) => {
+  let state = seed >>> 0;
+  return () => {
+    state += 0x6d2b79f5;
+    let result = Math.imul(state ^ (state >>> 15), 1 | state);
+    result ^= result + Math.imul(result ^ (result >>> 7), 61 | result);
+    return ((result ^ (result >>> 14)) >>> 0) / MAX_UINT32;
+  };
+};
+
+const shuffle = <T,>(items: T[], random: () => number) => {
+  const copy = [...items];
+  for (let i = copy.length - 1; i > 0; i -= 1) {
+    const index = Math.floor(random() * (i + 1));
+    [copy[i], copy[index]] = [copy[index], copy[i]];
+  }
+  return copy;
+};
+
+export const selectBalancedQuestions = (
+  allQuestions: Question[],
+  count: number,
+  seed: number
+) => {
+  const cappedCount = Math.min(Math.max(count, 0), allQuestions.length);
+  if (cappedCount === 0) {
+    return [];
+  }
+
+  const random = createSeededRandom(seed);
+  const grouped = allQuestions.reduce<Map<string, Question[]>>((acc, question) => {
+    const entries = acc.get(question.category) ?? [];
+    entries.push(question);
+    acc.set(question.category, entries);
+    return acc;
+  }, new Map());
+
+  const categories = shuffle([...grouped.keys()], random);
+  const baseCount = Math.floor(cappedCount / categories.length);
+  const desiredByCategory = new Map<string, number>();
+  let assigned = 0;
+
+  for (const category of categories) {
+    const pool = grouped.get(category) ?? [];
+    const desired = Math.min(baseCount, pool.length);
+    desiredByCategory.set(category, desired);
+    assigned += desired;
+  }
+
+  let remaining = cappedCount - assigned;
+  while (remaining > 0) {
+    for (const category of categories) {
+      if (remaining === 0) {
+        break;
+      }
+      const pool = grouped.get(category) ?? [];
+      const current = desiredByCategory.get(category) ?? 0;
+      if (current < pool.length) {
+        desiredByCategory.set(category, current + 1);
+        remaining -= 1;
+      }
+    }
+  }
+
+  const selected: Question[] = [];
+  for (const category of categories) {
+    const pool = grouped.get(category) ?? [];
+    const desired = desiredByCategory.get(category) ?? 0;
+    if (desired > 0) {
+      selected.push(...shuffle(pool, random).slice(0, desired));
+    }
+  }
+
+  return selected;
+};
