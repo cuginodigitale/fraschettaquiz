@@ -7,11 +7,12 @@ const CANVAS_WIDTH = 1080;
 const CANVAS_HEIGHT = 1350;
 
 const RESULT_PAYLOAD = {
-  score: 18,
-  total: 24,
-  category: "L'Analista de fretta",
+  score: 12,
+  total: 16,
+  profile: "Cliente co' fame",
   sarcasm:
-    "Complimenti, hai risorto er quiz co' la grazia de 'n prompt alle 2 de notte.",
+    "Complimenti, hai risposto co' la grazia de 'n oste che c'ha da serve altri dieci tavoli.",
+  location: "Roma",
 };
 
 const drawRoundedRect = (
@@ -48,6 +49,13 @@ export default function ResultsPage() {
     () => `${RESULT_PAYLOAD.score}/${RESULT_PAYLOAD.total}`,
     [],
   );
+  const dateLabel = useMemo(() => {
+    return new Intl.DateTimeFormat("it-IT", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    }).format(new Date());
+  }, []);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -91,11 +99,11 @@ export default function ResultsPage() {
 
       ctx.fillStyle = "#64748b";
       ctx.font = "600 44px ui-sans-serif, system-ui";
-      ctx.fillText("Categoria", 140, 710);
+      ctx.fillText("Profilo", 140, 710);
 
       ctx.fillStyle = "#0f172a";
       ctx.font = "700 60px ui-sans-serif, system-ui";
-      ctx.fillText(RESULT_PAYLOAD.category, 140, 790);
+      ctx.fillText(RESULT_PAYLOAD.profile, 140, 790);
 
       ctx.fillStyle = "#475569";
       ctx.font = "500 46px ui-sans-serif, system-ui";
@@ -121,7 +129,11 @@ export default function ResultsPage() {
 
       ctx.fillStyle = "#94a3b8";
       ctx.font = "500 32px ui-sans-serif, system-ui";
-      ctx.fillText("Condividi senza rimorsi, daje de screenshot & post.", 140, 1160);
+      ctx.fillText(`${RESULT_PAYLOAD.location}, ${dateLabel}`, 140, 1160);
+
+      ctx.fillStyle = "#1f2937";
+      ctx.font = "700 36px ui-sans-serif, system-ui";
+      ctx.fillText("Firma: Er Patata", 140, 1220);
 
       canvas.toBlob((blob) => {
         if (!blob) return;
@@ -132,9 +144,9 @@ export default function ResultsPage() {
         }
         downloadUrlRef.current = objectUrl;
         setDownloadUrl(objectUrl);
-      }, "image/png");
+      }, "image/jpeg", 0.92);
     };
-  }, [scoreLabel]);
+  }, [dateLabel, scoreLabel]);
 
   useEffect(() => {
     setShareSupported(Boolean(navigator?.share));
@@ -152,8 +164,8 @@ export default function ResultsPage() {
   const handleShare = async () => {
     if (!shareBlob) return;
     setShareError(null);
-    const shareFile = new File([shareBlob], "diploma-quiz.png", {
-      type: "image/png",
+    const shareFile = new File([shareBlob], "diploma-quiz.jpg", {
+      type: "image/jpeg",
     });
     try {
       if (navigator.canShare?.({ files: [shareFile] })) {
@@ -188,8 +200,7 @@ export default function ResultsPage() {
           Risurtati der quiz
         </h2>
         <p className="mt-3 text-sm text-slate-600">
-          Genera er template social co' logo, punteggio e la tua frase sarcastica
-          preferita.
+          Genera er template social co' logo, punteggio, profilo, data e firma.
         </p>
       </div>
 
@@ -201,7 +212,7 @@ export default function ResultsPage() {
             </h3>
             <p className="mt-2 text-sm text-slate-600">
               Er canvas è renderizzato client-side e pronto pe' l&apos;export in
-              PNG.
+              JPG.
             </p>
             <div className="mt-6 overflow-hidden rounded-2xl border border-slate-200">
               <canvas ref={canvasRef} className="h-auto w-full" />
@@ -218,12 +229,16 @@ export default function ResultsPage() {
                 {scoreLabel}
               </li>
               <li>
-                <span className="font-semibold text-slate-900">Categoria:</span>{" "}
-                {RESULT_PAYLOAD.category}
+                <span className="font-semibold text-slate-900">Profilo:</span>{" "}
+                {RESULT_PAYLOAD.profile}
               </li>
               <li>
                 <span className="font-semibold text-slate-900">Frase:</span>{" "}
                 {RESULT_PAYLOAD.sarcasm}
+              </li>
+              <li>
+                <span className="font-semibold text-slate-900">Data e luogo:</span>{" "}
+                {RESULT_PAYLOAD.location}, {dateLabel}
               </li>
             </ul>
 
@@ -231,7 +246,7 @@ export default function ResultsPage() {
               {downloadUrl ? (
                 <a
                   href={downloadUrl}
-                  download="diploma-quiz.png"
+                  download="diploma-quiz.jpg"
                   className="inline-flex w-full items-center justify-center rounded-full bg-brand-primary px-4 py-3 text-sm font-semibold text-white"
                 >
                   Scarica er diploma
