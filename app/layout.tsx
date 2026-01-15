@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Fraschetta Quiz",
-  description: "Quiz mobile-first con placeholder per branding."
+  description: "Quiz mobile-first co' placeholder pe' er branding."
 };
 
 export default function RootLayout({
@@ -19,12 +19,12 @@ export default function RootLayout({
             <div className="flex items-center gap-3">
               <img
                 src="/branding/logo-placeholder.svg"
-                alt="Logo placeholder"
+                alt="Logo de prova"
                 className="h-10 w-10"
               />
               <div>
                 <p className="text-xs uppercase tracking-[0.3em] text-slate-500">
-                  Brand placeholder
+                  Brand de prova
                 </p>
                 <h1 className="text-lg font-semibold text-brand-primary">
                   Fraschetta Quiz
@@ -38,7 +38,7 @@ export default function RootLayout({
           <main className="flex-1 pt-8">{children}</main>
           <footer className="mt-10 text-center text-xs text-slate-500">
             <p>
-              Placeholder palette: primary, secondary, accent. Aggiornare con la
+              Palette de prova: primary, secondary, accent. Poi se cambia co' la
               palette ufficiale.
             </p>
           </footer>

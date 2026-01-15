@@ -7,20 +7,57 @@ import { questions, selectBalancedQuestions } from "@/data/questions";
 const QUESTION_COUNT = 12;
 const SEED_STORAGE_KEY = "fraschettaquiz-seed";
 
+const verdictRanges = [
+  {
+    min: 90,
+    phrases: [
+      "Aho, t'hanno fatto Console d'Oro: ma chi sei, er Sindaco de Trastevere?",
+      "Te la magni la città a morsi: pure er Tevere se leva er cappello.",
+      "Sei 'n'enciclopedia co' er bacio de Roma stampato in fronte."
+    ]
+  },
+  {
+    min: 70,
+    phrases: [
+      "Niente male, te la cavi. Mo' però nun te allargà troppo, eh.",
+      "Se vede che c'hai occhio: te manca giusto 'n giro pe' fa' er fenomeno.",
+      "Bravo, stai sul pezzo: ancora 'na spinta e sei da panettone."
+    ]
+  },
+  {
+    min: 50,
+    phrases: [
+      "Ce potevi fa' de meglio, ma nun sei proprio 'n fregnone.",
+      "Mezzo e mezzo: sei come er supplì, bello ma te manca 'na scrocchia.",
+      "Te la giochi, ma ogni tanto te perdi pe' strada come er tram 8."
+    ]
+  },
+  {
+    min: 30,
+    phrases: [
+      "Aho, te sei presentato, ma pare che stavi a pensà ar cornetto.",
+      "Te sei messo in fila, però er cervello è rimasto ar bar.",
+      "Daje che ce sei quasi... ma solo co' l'occhi."
+    ]
+  },
+  {
+    min: 0,
+    phrases: [
+      "Te lo dico co' affetto: stai più spaesato de 'n turista a Testaccio.",
+      "Er quiz t'ha fatto er solletico e te s'è fermato er pensiero.",
+      "Avoja a dì: qui c'è da fa' er ripasso serio, fratè."
+    ]
+  }
+];
+
 const getSarcasticVerdict = (scorePercentage: number) => {
-  if (scorePercentage >= 90) {
-    return "Aho, t'hanno fatto Console d'Oro: ma chi sei, er Sindaco de Trastevere?";
+  const range = verdictRanges.find((entry) => scorePercentage >= entry.min) ?? verdictRanges.at(-1);
+  const phrases = range?.phrases ?? [];
+  if (phrases.length === 0) {
+    return "";
   }
-  if (scorePercentage >= 70) {
-    return "Niente male, te la cavi. Mo' però nun te allargà troppo, eh.";
-  }
-  if (scorePercentage >= 50) {
-    return "Ce potevi fa' de meglio, ma nun sei proprio 'n fregnone.";
-  }
-  if (scorePercentage >= 30) {
-    return "Aho, te sei presentato, ma pare che stavi a pensà ar cornetto.";
-  }
-  return "Te lo dico co' affetto: stai più spaesato de 'n turista a Testaccio.";
+  const index = scorePercentage % phrases.length;
+  return phrases[index] ?? phrases[0];
 };
 
 export default function QuizPage() {
@@ -89,13 +126,13 @@ export default function QuizPage() {
     <section className="flex flex-col gap-6">
       <header className="rounded-3xl bg-white p-6 shadow-sm">
         <p className="text-xs font-semibold uppercase tracking-[0.3em] text-brand-secondary">
-          Quiz romano
+          Quiz de Roma
         </p>
         <h2 className="mt-3 text-2xl font-semibold text-slate-900">
-          Domanda singola, risposta secca.
+          Domanna secca, risposta dritta.
         </h2>
         <p className="mt-3 text-sm text-slate-600">
-          Rispondi una domanda alla volta: il punteggio finale ti giudica senza pietà.
+          Risponni 'na domanda alla vorta: er punteggio finale te giudica senza pietà.
         </p>
       </header>
 
@@ -103,7 +140,7 @@ export default function QuizPage() {
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-brand-secondary">
-              Progresso
+              A che punto stai
             </p>
             <p className="text-sm font-semibold text-slate-800">
               {currentIndex + 1} / {selected.length} · {answeredCount} risposte segnate
@@ -129,7 +166,7 @@ export default function QuizPage() {
               {String(currentIndex + 1).padStart(2, "0")} · {currentQuestion.category}
             </span>
             <span className="text-xs font-semibold text-slate-500">
-              Scelte multiple
+              Scelte mischiate
             </span>
           </div>
           <h3 className="mt-4 text-lg font-semibold text-slate-900">
@@ -156,7 +193,9 @@ export default function QuizPage() {
           </div>
           <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <p className="text-xs font-semibold text-slate-500">
-              {currentAnswer !== null ? "Risposta salvata." : "Scegli prima di andare avanti."}
+              {currentAnswer !== null
+                ? "Risposta segnata."
+                : "Scegli prima de annà avanti."}
             </p>
             {!isLastQuestion ? (
               <button
@@ -165,11 +204,11 @@ export default function QuizPage() {
                 disabled={currentAnswer === null}
                 className="rounded-full bg-brand-secondary px-6 py-3 text-center text-sm font-semibold text-white shadow disabled:cursor-not-allowed disabled:opacity-40"
               >
-                Avanti
+                Daje
               </button>
             ) : (
               <span className="rounded-full bg-brand-secondary/10 px-5 py-2 text-xs font-semibold text-brand-secondary">
-                Ultima domanda
+                Ultima botta
               </span>
             )}
           </div>
@@ -179,13 +218,13 @@ export default function QuizPage() {
       {isCompleted && (
         <div className="rounded-3xl bg-brand-secondary p-6 text-white">
           <p className="text-xs font-semibold uppercase tracking-[0.3em] text-white/70">
-            Risultato finale
+            Risurtato finale
           </p>
           <h3 className="mt-3 text-2xl font-semibold">
-            {score} risposte corrette su {selected.length}
+            {score} risposte giuste su {selected.length}
           </h3>
           <p className="mt-2 text-sm text-white/80">
-            Score: {scorePercentage}% · {verdict}
+            Punteggio: {scorePercentage}% · {verdict}
           </p>
         </div>
       )}
@@ -195,7 +234,7 @@ export default function QuizPage() {
           href="/"
           className="rounded-full border border-brand-secondary/30 px-5 py-3 text-center text-sm font-semibold text-brand-secondary"
         >
-          Torna alla home
+          Torna ar começo
         </Link>
       </div>
     </section>

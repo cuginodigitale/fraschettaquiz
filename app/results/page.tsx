@@ -9,9 +9,9 @@ const CANVAS_HEIGHT = 1350;
 const RESULT_PAYLOAD = {
   score: 18,
   total: 24,
-  category: "L'Analista Impaziente",
+  category: "L'Analista de fretta",
   sarcasm:
-    "Congratulazioni: hai risolto il quiz con la grazia di un prompt alle 2 di notte.",
+    "Complimenti, hai risorto er quiz co' la grazia de 'n prompt alle 2 de notte.",
 };
 
 const drawRoundedRect = (
@@ -83,7 +83,7 @@ export default function ResultsPage() {
 
       ctx.fillStyle = "#0f172a";
       ctx.font = "700 72px ui-sans-serif, system-ui";
-      ctx.fillText("Risultato quiz", 140, 420);
+      ctx.fillText("Risurtato der quiz", 140, 420);
 
       ctx.fillStyle = "#1d4ed8";
       ctx.font = "800 160px ui-sans-serif, system-ui";
@@ -121,7 +121,7 @@ export default function ResultsPage() {
 
       ctx.fillStyle = "#94a3b8";
       ctx.font = "500 32px ui-sans-serif, system-ui";
-      ctx.fillText("Condividi senza rimorsi. Screenshot & post.", 140, 1160);
+      ctx.fillText("Condividi senza rimorsi, daje de screenshot & post.", 140, 1160);
 
       canvas.toBlob((blob) => {
         if (!blob) return;
@@ -158,23 +158,23 @@ export default function ResultsPage() {
     try {
       if (navigator.canShare?.({ files: [shareFile] })) {
         await navigator.share({
-          title: "Il mio diploma del quiz",
-          text: "Ho appena completato il quiz. Ecco il mio diploma!",
+          title: "Er mio diploma der quiz",
+          text: "Ho appena finito er quiz. Ecco er mio diploma!",
           files: [shareFile],
         });
         return;
       }
       if (navigator.share) {
         await navigator.share({
-          title: "Il mio diploma del quiz",
-          text: "Ho appena completato il quiz. Ecco il mio diploma!",
+          title: "Er mio diploma der quiz",
+          text: "Ho appena finito er quiz. Ecco er mio diploma!",
           url: shareLink,
         });
         return;
       }
-      setShareError("Condivisione non supportata su questo dispositivo.");
+      setShareError("Condivisione nun supportata su 'sto dispositivo.");
     } catch (error) {
-      setShareError("Condivisione annullata o non disponibile.");
+      setShareError("Condivisione annullata o nun disponibile.");
     }
   };
 
@@ -182,13 +182,13 @@ export default function ResultsPage() {
     <section className="flex flex-col gap-6">
       <div className="rounded-3xl bg-white p-6 shadow-sm">
         <p className="text-xs font-semibold uppercase tracking-[0.3em] text-brand-secondary">
-          Route /results
+          Strada /results
         </p>
         <h2 className="mt-3 text-2xl font-semibold text-slate-900">
-          Risultati del quiz
+          Risurtati der quiz
         </h2>
         <p className="mt-3 text-sm text-slate-600">
-          Genera il template social con logo, punteggio e la tua frase sarcastica
+          Genera er template social co' logo, punteggio e la tua frase sarcastica
           preferita.
         </p>
       </div>
@@ -197,10 +197,10 @@ export default function ResultsPage() {
         <div className="flex flex-col gap-6 lg:flex-row lg:items-start">
           <div className="flex-1">
             <h3 className="text-lg font-semibold text-slate-900">
-              Anteprima canvas
+              Anteprima der canvas
             </h3>
             <p className="mt-2 text-sm text-slate-600">
-              Il canvas è renderizzato client-side e pronto per l&apos;export in
+              Er canvas è renderizzato client-side e pronto pe' l&apos;export in
               PNG.
             </p>
             <div className="mt-6 overflow-hidden rounded-2xl border border-slate-200">
@@ -210,7 +210,7 @@ export default function ResultsPage() {
 
           <div className="w-full max-w-sm rounded-2xl bg-slate-50 p-5 text-sm text-slate-600">
             <h4 className="text-base font-semibold text-slate-900">
-              Dettagli pronti per la condivisione
+              Dettagli pronti pe' la condivisione
             </h4>
             <ul className="mt-3 space-y-2">
               <li>
@@ -234,11 +234,11 @@ export default function ResultsPage() {
                   download="diploma-quiz.png"
                   className="inline-flex w-full items-center justify-center rounded-full bg-brand-primary px-4 py-3 text-sm font-semibold text-white"
                 >
-                  Scarica diploma
+                  Scarica er diploma
                 </a>
               ) : (
                 <p className="text-xs text-slate-400">
-                  Generazione immagine in corso...
+                  Sto a fa' l'immagine...
                 </p>
               )}
               {shareSupported && (
@@ -248,7 +248,7 @@ export default function ResultsPage() {
                   className="inline-flex w-full items-center justify-center rounded-full border border-brand-primary/30 px-4 py-3 text-sm font-semibold text-brand-primary"
                   disabled={!shareBlob}
                 >
-                  Condividi (mobile)
+                  Condividi (dar mobile)
                 </button>
               )}
               {shareError && (
@@ -261,8 +261,8 @@ export default function ResultsPage() {
                 Facebook & Instagram
               </p>
               <p className="mt-2">
-                Per condividere l&apos;immagine: scarica il diploma, poi caricalo
-                come foto o storia. Su Facebook puoi anche aprire il link di
+                Pe' condivide l&apos;immagine: scarica er diploma, poi caricalo
+                come foto o storia. Su Facebook puoi pure aprì er link de
                 condivisione.
               </p>
               <a
@@ -273,7 +273,7 @@ export default function ResultsPage() {
                 rel="noreferrer"
                 className="mt-3 inline-flex w-full items-center justify-center rounded-full border border-slate-200 px-3 py-2 text-xs font-semibold text-slate-700"
               >
-                Apri condivisione Facebook
+                Apri condivisione su Facebook
               </a>
             </div>
           </div>
@@ -284,7 +284,7 @@ export default function ResultsPage() {
         href="/quiz"
         className="rounded-full border border-brand-primary/30 px-5 py-3 text-center text-sm font-semibold text-brand-primary"
       >
-        Torna al quiz
+        Torna ar quiz
       </Link>
     </section>
   );
